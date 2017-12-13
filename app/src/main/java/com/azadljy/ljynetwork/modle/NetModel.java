@@ -1,0 +1,45 @@
+package com.azadljy.ljynetwork.modle;
+
+import com.azadljy.ljynetwork.NetModelStatus;
+import com.azadljy.ljynetwork.ResponseResult;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by azadljy on 2017/12/14.
+ */
+
+public class NetModel {
+
+    private Map<String, Object> parameters;
+    private ResponseResult result;
+    private NetModelStatus status;
+
+
+    public NetModel(Map<String, Object> parameters) {
+        this.parameters = parameters;
+        status = NetModelStatus.READY;
+    }
+
+    public Map<String, Object> getParameters() {
+        return parameters;
+    }
+
+    public ResponseResult getResult() {
+        return result;
+    }
+
+    public void setResult(ResponseResult result) {
+        this.result = result;
+    }
+
+
+    public NetModelStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NetModelStatus status) {
+        this.status = status;
+    }
+}
