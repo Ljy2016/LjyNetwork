@@ -33,7 +33,4 @@ public class NetServer implements IRequest {
 
     }
 
-
-
-
 }

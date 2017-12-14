@@ -15,6 +15,7 @@ public class NetModel {
     private Map<String, Object> parameters;
     private ResponseResult result;
     private NetModelStatus status;
+    private String url = "http://121.201.67.222:16990/api.post";
 
 
     public NetModel(Map<String, Object> parameters) {
@@ -22,8 +23,19 @@ public class NetModel {
         status = NetModelStatus.READY;
     }
 
+    public NetModel(Map<String, Object> parameters, String url) {
+        this.parameters = parameters;
+        status = NetModelStatus.READY;
+        this.url = url;
+    }
+
+
     public Map<String, Object> getParameters() {
         return parameters;
+    }
+
+    public void setParameters(Map<String, Object> parameters) {
+        this.parameters = parameters;
     }
 
     public ResponseResult getResult() {
@@ -42,4 +54,15 @@ public class NetModel {
     public void setStatus(NetModelStatus status) {
         this.status = status;
     }
+
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+
 }
