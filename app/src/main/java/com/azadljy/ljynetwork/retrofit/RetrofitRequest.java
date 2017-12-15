@@ -34,12 +34,25 @@ public class RetrofitRequest implements IRequest {
     RetrofitService service;
     Call<ResponseBody> call;
 
-    public RetrofitRequest() {
+    private volatile static RetrofitRequest instance;
+
+
+    private RetrofitRequest() {
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://121.201.67.222:16990/") // 设置网络请求的Url地址
+                .baseUrl("") // 设置网络请求的Url地址
                 .build();
         service = retrofit.create(RetrofitService.class);
+    }
 
+    public static RetrofitRequest getInstance() {
+        if (instance == null) {
+            synchronized (RetrofitRequest.class) {
+                if (instance == null) {
+                    instance = new RetrofitRequest();
+                }
+            }
+        }
+        return instance;
     }
 
 
@@ -51,32 +64,32 @@ public class RetrofitRequest implements IRequest {
     @Override
     public void sendPostRequest(final NetModel action) {
         call = service.post(action.getUrl(), action.getParameters());
-        call.enqueue(new Callback<ResponseBody>() {
+        Observable<NetModel> observable = Observable.create(new ObservableOnSubscribe<NetModel>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
-                try {
-                    Observable<NetModel> observable = Observable.create(new ObservableOnSubscribe<NetModel>() {
-                        @Override
-                        public void subscribe(@NonNull ObservableEmitter<NetModel> e) throws Exception {
+            public void subscribe(@NonNull final ObservableEmitter<NetModel> e) throws Exception {
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
+                        try {
                             ResponseResult result = new ResponseResult();
                             result.setContent(response.body().string());
                             action.setResult(result);
                             e.onNext(action);
                             e.onComplete();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    });
+                    }
 
-                    observable.subscribe(MainActivity.observer);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        e.onError(t);
+                    }
+                });
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("TAG", "onResponse2: " + t.getMessage());
             }
         });
+        observable.subscribe(action.getObserver());
     }
 
 

@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-        retrofitRequest = new RetrofitRequest();
+        retrofitRequest = RetrofitRequest.getInstance();
 
     }
 
@@ -40,11 +40,11 @@ public class MainActivity extends AppCompatActivity {
         params.put("func", "shop_new_loginA");
         params.put("words", CommonUtils.Md5("shop_new_loginA") + CommonUtils.aesEncrypt(JsonUtils.createJSON(hashMap).toString(), CommonUtils.Md5("shop_new_loginA")));
         NetModel model = new NetModel(params);
-
+        model.setObserver(observer);
         retrofitRequest.sendPostRequest(model);
     }
 
-    public static Observer<NetModel> observer = new Observer<NetModel>() {
+    public Observer<NetModel> observer = new Observer<NetModel>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
 

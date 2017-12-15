@@ -6,6 +6,8 @@ import com.azadljy.ljynetwork.ResponseResult;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observer;
+
 /**
  * Created by azadljy on 2017/12/14.
  */
@@ -16,7 +18,7 @@ public class NetModel {
     private ResponseResult result;
     private NetModelStatus status;
     private String url = "http://121.201.67.222:16990/api.post";
-
+    private Observer<NetModel> observer;
 
     public NetModel(Map<String, Object> parameters) {
         this.parameters = parameters;
@@ -64,5 +66,11 @@ public class NetModel {
         this.url = url;
     }
 
+    public Observer<NetModel> getObserver() {
+        return observer;
+    }
 
+    public void setObserver(Observer<NetModel> observer) {
+        this.observer = observer;
+    }
 }
