@@ -1,9 +1,14 @@
 package com.azadljy.ljynetwork.retrofit;
 
+import com.azadljy.ljynetwork.modle.NetModel;
+
 import java.util.Map;
 
+
+import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -25,4 +30,8 @@ public interface RetrofitService {
     @POST()
     @FormUrlEncoded
     Call<ResponseBody> post(@Url String url, @FieldMap Map<String, Object> map);
+
+    @POST()
+    @FormUrlEncoded
+    Observable<Response<ResponseBody>> post1(@Url String url, @FieldMap Map<String, Object> map);
 }

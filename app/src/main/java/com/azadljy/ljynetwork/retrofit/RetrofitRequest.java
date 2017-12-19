@@ -9,18 +9,25 @@ import com.azadljy.ljynetwork.modle.NetModel;
 import com.azadljy.ljynetwork.retrofit.RetrofitService;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.http.Url;
+
 
 /**
  * 作者：Ljy on 2017/12/14.
@@ -39,7 +46,8 @@ public class RetrofitRequest implements IRequest {
 
     private RetrofitRequest() {
         retrofit = new Retrofit.Builder()
-                .baseUrl("") // 设置网络请求的Url地址
+                .baseUrl("http://121.201.67.222:16990/")// 设置网络请求的Url地址
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
         service = retrofit.create(RetrofitService.class);
     }
@@ -63,33 +71,24 @@ public class RetrofitRequest implements IRequest {
 
     @Override
     public void sendPostRequest(final NetModel action) {
-        call = service.post(action.getUrl(), action.getParameters());
-        Observable<NetModel> observable = Observable.create(new ObservableOnSubscribe<NetModel>() {
-            @Override
-            public void subscribe(@NonNull final ObservableEmitter<NetModel> e) throws Exception {
-                call.enqueue(new Callback<ResponseBody>() {
+        service.post1(action.getUrl(), action.getParameters())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Function<Response<ResponseBody>, NetModel>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
+                    public NetModel apply(@NonNull Response<ResponseBody> responseBody) throws Exception {
                         try {
                             ResponseResult result = new ResponseResult();
-                            result.setContent(response.body().string());
+                            result.setContent(responseBody.body().string());
                             action.setResult(result);
-                            e.onNext(action);
-                            e.onComplete();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        e.onError(t);
+                        return action;
                     }
-                });
+                }).subscribe(action.getObserver());
 
-            }
-        });
-        observable.subscribe(action.getObserver());
     }
 
 

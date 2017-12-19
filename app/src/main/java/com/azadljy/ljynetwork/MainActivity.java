@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         Map<String, Object> params = new HashMap<>();
         params.put("func", "shop_new_loginA");
         params.put("words", CommonUtils.Md5("shop_new_loginA") + CommonUtils.aesEncrypt(JsonUtils.createJSON(hashMap).toString(), CommonUtils.Md5("shop_new_loginA")));
-        NetModel model = new NetModel(params);
+        NetModel model = new NetModel(params,"http://121.201.67.222:16990/api.post/");
         model.setObserver(observer);
         retrofitRequest.sendPostRequest(model);
     }
@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onNext(@NonNull NetModel s) {
             ResponseResult result = s.getResult();
-
             textView.setText((String) result.getContent());
         }
 
