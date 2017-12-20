@@ -150,14 +150,19 @@ public class CityPicker extends LinearLayout {
 
         cityPicker = (ScrollerNumberPicker) findViewById(R.id.city);
         counyPicker = (ScrollerNumberPicker) findViewById(R.id.couny);
-        provincePicker.setData(citycodeUtil.getProvince(province_list));
-        provincePicker.setDefault(1);
-        cityPicker.setData(citycodeUtil.getCity(city_map, citycodeUtil
-                .getProvince_list_code().get(1)));
-        cityPicker.setDefault(1);
-        counyPicker.setData(citycodeUtil.getCouny(couny_map, citycodeUtil
-                .getCity_list_code().get(1)));
-        counyPicker.setDefault(1);
+        try {
+            provincePicker.setData(citycodeUtil.getProvince(province_list));
+            provincePicker.setDefault(1);
+            cityPicker.setData(citycodeUtil.getCity(city_map, citycodeUtil
+                    .getProvince_list_code().get(1)));
+            cityPicker.setDefault(1);
+            counyPicker.setData(citycodeUtil.getCouny(couny_map, citycodeUtil
+                    .getCity_list_code().get(1)));
+            counyPicker.setDefault(1);
+        } catch (Exception e) {
+
+        }
+
         provincePicker.setOnSelectListener(new ScrollerNumberPicker.OnSelectListener() {
 
             @Override
