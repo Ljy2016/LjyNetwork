@@ -19,6 +19,8 @@ public class NetModel {
     private NetModelStatus status;
     private String url = "http://121.201.67.222:16990/api.post";
     private Observer<NetModel> observer;
+    private String tag;
+    private Object object;
 
     public NetModel(Map<String, Object> parameters) {
         this.parameters = parameters;
@@ -72,5 +74,21 @@ public class NetModel {
 
     public void setObserver(Observer<NetModel> observer) {
         this.observer = observer;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
     }
 }

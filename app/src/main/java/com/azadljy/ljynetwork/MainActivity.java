@@ -1,5 +1,6 @@
 package com.azadljy.ljynetwork;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +9,11 @@ import android.widget.TextView;
 import com.azadljy.ljynetwork.modle.NetModel;
 import com.azadljy.ljynetwork.retrofit.RetrofitRequest;
 import com.azadljy.ljynetwork.utils.CommonUtils;
+import com.azadljy.ljynetwork.utils.ConstantUtil;
 import com.azadljy.ljynetwork.utils.JsonUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         Map<String, Object> params = new HashMap<>();
         params.put("func", "shop_new_loginA");
         params.put("words", CommonUtils.Md5("shop_new_loginA") + CommonUtils.aesEncrypt(JsonUtils.createJSON(hashMap).toString(), CommonUtils.Md5("shop_new_loginA")));
-        NetModel model = new NetModel(params,"http://121.201.67.222:16990/api.post/");
+        NetModel model = new NetModel(params, "http://121.201.67.222:16990/api.post/");
         model.setObserver(observer);
         retrofitRequest.sendPostRequest(model);
     }
@@ -53,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onNext(@NonNull NetModel s) {
             ResponseResult result = s.getResult();
-            textView.setText((String) result.getContent());
+            try {
+                JSONObject jsonObject = new JSONObject((String) result.getContent());
+                ConstantUtil.SP_RANDOMCODE = jsonObject.getString("随机码");
+                startActivity(new Intent(MainActivity.this, CityDataActivity.class));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

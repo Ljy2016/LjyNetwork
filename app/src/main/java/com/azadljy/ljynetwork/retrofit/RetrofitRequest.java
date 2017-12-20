@@ -1,5 +1,6 @@
 package com.azadljy.ljynetwork.retrofit;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.azadljy.ljynetwork.IRequest;
@@ -10,6 +11,7 @@ import com.azadljy.ljynetwork.retrofit.RetrofitService;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.reactivex.Observable;
