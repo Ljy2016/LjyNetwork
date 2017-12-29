@@ -261,18 +261,20 @@ public class ScrollerNumberPicker extends View {
             if (item.isSelected())
                 return;
         }
-        int move = (int) itemList.get(0).moveToSelected();
-        if (move < 0) {
-            defaultMove(move);
-        } else {
-            defaultMove((int) itemList.get(itemList.size() - 1)
-                    .moveToSelected());
-        }
-        for (ItemObject item : itemList) {
-            if (item.isSelected()) {
-                if (onSelectListener != null)
-                    onSelectListener.endSelect(item.id, item.itemText);
-                break;
+        if (itemList.size() > 0) {
+            int move = (int) itemList.get(0).moveToSelected();
+            if (move < 0) {
+                defaultMove(move);
+            } else {
+                defaultMove((int) itemList.get(itemList.size() - 1)
+                        .moveToSelected());
+            }
+            for (ItemObject item : itemList) {
+                if (item.isSelected()) {
+                    if (onSelectListener != null)
+                        onSelectListener.endSelect(item.id, item.itemText);
+                    break;
+                }
             }
         }
     }

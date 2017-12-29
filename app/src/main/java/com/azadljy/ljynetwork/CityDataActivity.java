@@ -1,5 +1,6 @@
 package com.azadljy.ljynetwork;
 
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.azadljy.ljynetwork.bean.JsonBean;
 import com.azadljy.ljynetwork.city.CityPicker;
 import com.azadljy.ljynetwork.city.Cityinfo;
 import com.azadljy.ljynetwork.city.ScrollerNumberPicker;
@@ -18,6 +21,7 @@ import com.azadljy.ljynetwork.retrofit.RetrofitRequest;
 import com.azadljy.ljynetwork.utils.CommonUtils;
 import com.azadljy.ljynetwork.utils.ConstantUtil;
 import com.azadljy.ljynetwork.utils.JsonUtils;
+import com.bigkoo.pickerview.OptionsPickerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,9 +39,16 @@ import io.reactivex.disposables.Disposable;
 
 public class CityDataActivity extends AppCompatActivity {
     RetrofitRequest retrofitRequest;
-    private List<Cityinfo> province_list = new ArrayList<>();
-    private HashMap<String, List<Cityinfo>> city_map = new HashMap<>();
-    private HashMap<String, List<Cityinfo>> couny_map = new HashMap<>();
+    public static List<Cityinfo> province_list = new ArrayList<>();
+    public static HashMap<String, List<Cityinfo>> city_map = new HashMap<>();
+    public static HashMap<String, List<Cityinfo>> couny_map = new HashMap<>();
+
+
+    private ArrayList<JsonBean> options1Items = new ArrayList<>();
+    private ArrayList<ArrayList<String>> options2Items = new ArrayList<>();
+    private ArrayList<ArrayList<ArrayList<String>>> options3Items = new ArrayList<>();
+
+
     private String url = "http://121.201.67.222:16990/api.post/";
     TextView textView2;
 
@@ -60,7 +71,7 @@ public class CityDataActivity extends AppCompatActivity {
         builder.setView(view);
         LinearLayout addressdialog_linearlayout = view.findViewById(R.id.addressdialog_linearlayout);
         CityPicker cityPicker1 = view.findViewById(R.id.citypicker);
-        cityPicker1.setInfo(province_list, city_map, couny_map);
+//        cityPicker1.setInfo(province_list, city_map, couny_map);
         final ScrollerNumberPicker provincePicker = view.findViewById(R.id.province);
         final ScrollerNumberPicker cityPicker = view.findViewById(R.id.city);
         final ScrollerNumberPicker counyPicker = view.findViewById(R.id.couny);
@@ -75,6 +86,12 @@ public class CityDataActivity extends AppCompatActivity {
 
             }
         });
+
+//        Log.e("TAG", "show: "+province_list.toString());
+//        Log.e("TAG", "show: "+city_map.toString());
+//        Log.e("TAG", "show: "+couny_map.toString());
+
+
     }
 
     int count = 0;
@@ -281,6 +298,33 @@ public class CityDataActivity extends AppCompatActivity {
             requestContent += itEntry.getKey() + "=" + itEntry.getValue() + "\n";
         }
         Log.e("HttpRequest", requestContent);
+    }
+
+
+    private void ShowPickerView() {// 弹出选择器
+
+        OptionsPickerView pvOptions = new OptionsPickerView.Builder(this, new OptionsPickerView.OnOptionsSelectListener() {
+            @Override
+            public void onOptionsSelect(int options1, int options2, int options3, View v) {
+                //返回的分别是三个级别的选中位置
+                String tx = province_list.get(options1).getCity_name() +
+                        city_map.get(options1).get(options2) +
+                        couny_map.get(options1).get(options2).getCity_name();
+
+                Toast.makeText(CityDataActivity.this, tx, Toast.LENGTH_SHORT).show();
+            }
+        })
+
+                .setTitleText("城市选择")
+                .setDividerColor(Color.BLACK)
+                .setTextColorCenter(Color.BLACK) //设置选中项文字颜色
+                .setContentTextSize(20)
+                .build();
+
+        /*pvOptions.setPicker(options1Items);//一级选择器
+        pvOptions.setPicker(options1Items, options2Items);//二级选择器*/
+//        pvOptions.setPicker(province_list, city_map, couny_map);//三级选择器
+        pvOptions.show();
     }
 
 }
