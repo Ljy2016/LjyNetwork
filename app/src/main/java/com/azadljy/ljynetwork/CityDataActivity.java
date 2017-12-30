@@ -37,6 +37,8 @@ import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 
+import cn.qqtheme.framework.entity.JavaBean;
+
 public class CityDataActivity extends AppCompatActivity {
     RetrofitRequest retrofitRequest;
     public static List<Cityinfo> province_list = new ArrayList<>();
@@ -44,7 +46,7 @@ public class CityDataActivity extends AppCompatActivity {
     public static HashMap<String, List<Cityinfo>> couny_map = new HashMap<>();
 
 
-    private ArrayList<JsonBean> options1Items = new ArrayList<>();
+    private ArrayList<String> options1Items = new ArrayList<>();
     private ArrayList<ArrayList<String>> options2Items = new ArrayList<>();
     private ArrayList<ArrayList<ArrayList<String>>> options3Items = new ArrayList<>();
 
@@ -170,6 +172,7 @@ public class CityDataActivity extends AppCompatActivity {
 
         }
     };
+    //规格解析
     private Observer<NetModel> observerOne = new Observer<NetModel>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {

@@ -37,4 +37,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile 'com.contrarywind:Android-PickerView:3.2.7'
+
+
+
+    compile 'com.github.gzu-liyujiang.AndroidPicker:ColorPicker:1.5.5'
 }
