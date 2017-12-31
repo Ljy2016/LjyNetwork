@@ -2,6 +2,7 @@ package com.azadljy.ljynetwork.modle;
 
 import com.azadljy.ljynetwork.NetModelStatus;
 import com.azadljy.ljynetwork.ResponseResult;
+import com.azadljy.ljynetwork.bean.CityTreeNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class NetModel {
     private Observer<NetModel> observer;
     private String tag;
     private Object object;
+    private CityTreeNode parent;
 
     public NetModel(Map<String, Object> parameters) {
         this.parameters = parameters;
@@ -90,5 +92,13 @@ public class NetModel {
 
     public void setObject(Object object) {
         this.object = object;
+    }
+
+    public CityTreeNode getParent() {
+        return parent;
+    }
+
+    public void setParent(CityTreeNode parent) {
+        this.parent = parent;
     }
 }
