@@ -22,7 +22,8 @@ public class NetModel {
     private Observer<NetModel> observer;
     private String tag;
     private Object object;
-    private CityTreeNode parent;
+    private String firstId;
+    private String secondId;
 
     public NetModel(Map<String, Object> parameters) {
         this.parameters = parameters;
@@ -35,6 +36,21 @@ public class NetModel {
         this.url = url;
     }
 
+    public String getFirstId() {
+        return firstId;
+    }
+
+    public void setFirstId(String firstId) {
+        this.firstId = firstId;
+    }
+
+    public String getSecondId() {
+        return secondId;
+    }
+
+    public void setSecondId(String secondId) {
+        this.secondId = secondId;
+    }
 
     public Map<String, Object> getParameters() {
         return parameters;
@@ -94,11 +110,5 @@ public class NetModel {
         this.object = object;
     }
 
-    public CityTreeNode getParent() {
-        return parent;
-    }
 
-    public void setParent(CityTreeNode parent) {
-        this.parent = parent;
-    }
 }

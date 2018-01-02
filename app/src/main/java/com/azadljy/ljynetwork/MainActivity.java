@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 JSONObject jsonObject = new JSONObject((String) result.getContent());
                 ConstantUtil.SP_RANDOMCODE = jsonObject.getString("随机码");
-                startActivity(new Intent(MainActivity.this, CityDataActivity.class));
+                startActivity(new Intent(MainActivity.this, CityDataJsonActivity.class));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
