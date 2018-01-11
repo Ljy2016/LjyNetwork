@@ -1,19 +1,23 @@
 package com.azadljy.ljynetwork;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.azadljy.ljynetwork.city.CityPicker;
 import com.azadljy.ljynetwork.city.Cityinfo;
+import com.azadljy.ljynetwork.city.FileUtil;
 import com.azadljy.ljynetwork.city.ScrollerNumberPicker;
 import com.azadljy.ljynetwork.modle.NetModel;
 import com.azadljy.ljynetwork.retrofit.RetrofitRequest;
@@ -26,6 +30,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,8 +44,9 @@ import java.util.Map;
 import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class CityDataJsonActivity extends AppCompatActivity {
+public class CityDataJsonActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
     RetrofitRequest retrofitRequest;
     public static List<Cityinfo> province_list = new ArrayList<>();
     public static HashMap<String, List<Cityinfo>> city_map = new HashMap<>();
@@ -66,47 +76,113 @@ public class CityDataJsonActivity extends AppCompatActivity {
 
     public void show(View v) {
 
+        try {
+            praseData();
+//            ShowPickerView();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("TAG", "show------------------------------------------------: \n" + e.getMessage());
+            return;
+        }
+//        Log.e("TAG", "show: " + province_list.size() + "-------------" + city_map.size() + "----------------" + couny_map.size());
+        AlertDialog.Builder builder = new AlertDialog.Builder(CityDataJsonActivity.this);
+        View view = LayoutInflater.from(CityDataJsonActivity.this).inflate(R.layout.addressdialog, null);
+        builder.setView(view);
+        LinearLayout addressdialog_linearlayout = view.findViewById(R.id.addressdialog_linearlayout);
+        CityPicker cityPicker1 = view.findViewById(R.id.citypicker);
+//        cityPicker1.setInfo(province_list, city_map, couny_map);
+        final ScrollerNumberPicker provincePicker = view.findViewById(R.id.province);
+        final ScrollerNumberPicker cityPicker = view.findViewById(R.id.city);
+        final ScrollerNumberPicker counyPicker = view.findViewById(R.id.couny);
+        final AlertDialog dialog = builder.show();
+        addressdialog_linearlayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-//        AlertDialog.Builder builder = new AlertDialog.Builder(CityDataJsonActivity.this);
-//        View view = LayoutInflater.from(CityDataJsonActivity.this).inflate(R.layout.addressdialog, null);
-//        builder.setView(view);
-//        LinearLayout addressdialog_linearlayout = view.findViewById(R.id.addressdialog_linearlayout);
-//        CityPicker cityPicker1 = view.findViewById(R.id.citypicker);
-////        cityPicker1.setInfo(province_list, city_map, couny_map);
-//        final ScrollerNumberPicker provincePicker = view.findViewById(R.id.province);
-//        final ScrollerNumberPicker cityPicker = view.findViewById(R.id.city);
-//        final ScrollerNumberPicker counyPicker = view.findViewById(R.id.couny);
-//        final AlertDialog dialog = builder.show();
-//        addressdialog_linearlayout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                textView2.setText(provincePicker.getSelectedText() + cityPicker.getSelectedText() + counyPicker.getSelectedText());
-//                Log.i("kkkk", provincePicker.getSelectedText() + cityPicker.getSelectedText() + counyPicker.getSelectedText());
-//                dialog.dismiss();
-//
-//            }
-//        });
+                textView2.setText(provincePicker.getSelectedText() + cityPicker.getSelectedText() + counyPicker.getSelectedText());
+                Log.i("kkkk", provincePicker.getSelectedText() + cityPicker.getSelectedText() + counyPicker.getSelectedText());
+                dialog.dismiss();
 
-//        Log.e("TAG", "show: "+province_list.toString());
-//        Log.e("TAG", "show: "+city_map.toString());
-//        Log.e("TAG", "show: "+couny_map.toString());
+            }
+        });
+//        if (checkPro()) {
+//            save();
+//        }
+    }
 
 
-        Log.e("TAG", "show: " + dataJson.toString());
+    public void save() {
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File file = new File(path, "myjson.txt");
 
+        try {
+            FileOutputStream stream = new FileOutputStream(file);
+            stream.write(dataJson.toString().getBytes());
+            stream.close();
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e("TAG", "show: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("TAG", "show: " + e.getMessage());
+        }
 
     }
 
-    private void getData() {
-        try {
-            JSONArray first=dataJson.getJSONArray("一级");
-            for(int i=0;i<first.length();i++){
-                options1Items.add("");
+    //解析省市区控件的数据
+    public void praseData() throws JSONException {
+        province_list.clear();
+        city_map.clear();
+        couny_map.clear();
+        JSONArray array = dataJson.getJSONArray("一级");
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject object = array.getJSONObject(i);
+            Cityinfo cityinfo = new Cityinfo();
+            if (TextUtils.isEmpty(object.getString("一级id")) || TextUtils.isEmpty(object.getString("一级"))) {
+                continue;
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            cityinfo.setId(object.getString("一级id"));
+            cityinfo.setCity_name(object.getString("一级"));
+            province_list.add(cityinfo);
+            JSONArray second = dataJson.getJSONArray("一级id:" + cityinfo.getId());
+            List<Cityinfo> secondinfo = new ArrayList<>();
+            for (int j = 0; j < second.length(); j++) {
+                JSONObject secondObj = second.getJSONObject(j);
+                Cityinfo cityinfo1 = new Cityinfo();
+                try {
+                    if (TextUtils.isEmpty(secondObj.getString("二级id")) || TextUtils.isEmpty(secondObj.getString("二级"))) {
+                        continue;
+                    }
+                    cityinfo1.setId(secondObj.getString("二级id"));
+                    cityinfo1.setCity_name(secondObj.getString("二级"));
+                    secondinfo.add(cityinfo1);
+                    city_map.put(cityinfo.getId(), secondinfo);
+                } catch (Exception e) {
+                    continue;
+                }
+
+                JSONArray third = dataJson.getJSONArray("二级id:" + cityinfo1.getId());
+                List<Cityinfo> thirdinfo = new ArrayList<>();
+                for (int k = 0; k < third.length(); k++) {
+                    JSONObject thirdObj = third.getJSONObject(k);
+                    Cityinfo cityinfo2 = new Cityinfo();
+                    try {
+                        if (TextUtils.isEmpty(thirdObj.getString("三级id")) || TextUtils.isEmpty(thirdObj.getString("三级"))) {
+                            continue;
+                        }
+                        cityinfo2.setId(thirdObj.getString("三级id"));
+                        cityinfo2.setCity_name(thirdObj.getString("三级"));
+                        thirdinfo.add(cityinfo2);
+                        couny_map.put(cityinfo1.getId(), thirdinfo);
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+
         }
+
     }
 
 
@@ -139,7 +215,7 @@ public class CityDataJsonActivity extends AppCompatActivity {
                         break;
                     case "two":
                         JSONArray cityArray = object.getJSONArray("二级列表");
-                        dataJson.put("二级id:" + s.getFirstId(), cityArray);
+                        dataJson.put("一级id:" + s.getFirstId(), cityArray);
                         for (int i = 0; i < cityArray.length(); i++) {
                             JSONObject city = cityArray.getJSONObject(i);
                             NetModel model = getModelOne("三级", "", city.getString("二级id"), "three");
@@ -148,7 +224,7 @@ public class CityDataJsonActivity extends AppCompatActivity {
                         break;
                     case "three":
                         JSONArray countyArray = object.getJSONArray("三级列表");
-                        dataJson.put("三级id:" + s.getSecondId(), countyArray);
+                        dataJson.put("二级id:" + s.getSecondId(), countyArray);
                         count++;
                         Log.e("TAG", "onNext: " + count);
                         break;
@@ -222,16 +298,45 @@ public class CityDataJsonActivity extends AppCompatActivity {
             }
         })
 
-                .setTitleText("城市选择")
+                .setTitleText("类别选择")
                 .setDividerColor(Color.BLACK)
                 .setTextColorCenter(Color.BLACK) //设置选中项文字颜色
                 .setContentTextSize(20)
                 .build();
 
-        /*pvOptions.setPicker(options1Items);//一级选择器
+        //pvOptions.setPicker(options1Items);//一级选择器
         pvOptions.setPicker(options1Items, options2Items);//二级选择器*/
 //        pvOptions.setPicker(province_list, city_map, couny_map);//三级选择器
         pvOptions.show();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @android.support.annotation.NonNull String[] permissions, @android.support.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+
+    }
+
+
+    String[] params = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS};
+
+    public boolean checkPro() {
+        if (EasyPermissions.hasPermissions(this, params)) {
+            return true;
+        } else {
+            EasyPermissions.requestPermissions(this, "给老子权限",
+                    10, params);
+            return false;
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int i, List<String> list) {
+        save();
+    }
+
+    @Override
+    public void onPermissionsDenied(int i, List<String> list) {
+
+    }
 }

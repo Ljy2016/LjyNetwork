@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 
 
 import com.azadljy.ljynetwork.CityDataActivity;
+import com.azadljy.ljynetwork.CityDataJsonActivity;
 import com.azadljy.ljynetwork.R;
 
 import java.util.ArrayList;
@@ -78,9 +79,9 @@ public class CityPicker extends LinearLayout {
 //		province_list = parser.getJSONParserResult(area_str, "area0");
 //		city_map = parser.getJSONParserResultArray(area_str, "area1");
 //		couny_map = parser.getJSONParserResultArray(area_str, "area2");
-        province_list = CityDataActivity.province_list;
-        city_map = CityDataActivity.city_map;
-        couny_map = CityDataActivity.couny_map;
+        province_list = CityDataJsonActivity.province_list;
+        city_map = CityDataJsonActivity.city_map;
+        couny_map = CityDataJsonActivity.couny_map;
     }
 
     public void setInfo(List<Cityinfo> province_list, HashMap<String, List<Cityinfo>> city_map, HashMap<String, List<Cityinfo>> couny_map) {
